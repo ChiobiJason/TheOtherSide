@@ -2,3 +2,4 @@
 ## Names of Developers
 - Victor Jason-Nwachukwu
 - Chisom Chiobi
+- Cherie Eze
