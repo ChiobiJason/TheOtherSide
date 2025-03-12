@@ -1,2 +1,4 @@
 # AUCSC220_Group3W25
-# Victor Jason-Nwachukwu
+## Names of Developers
+- Victor Jason-Nwachukwu
+- Chisom Chiobi
