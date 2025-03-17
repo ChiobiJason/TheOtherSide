@@ -25,6 +25,14 @@
 
 
             <!-- <activity -->
+<!--        <activity-->
+<!--            android:name=".ScreenGameOver"-->
+<!--            android:exported="true" >-->
+<!--        <activity-->
+<!--            android:name=".ScreenHighScore"-->
+<!--            android:exported="true">-->
+
+            <!-- <activity -->
             <!-- android:name=".MainActivity" -->
             <!-- android:exported="true"> -->
             <intent-filter>
