@@ -3,7 +3,6 @@ package com.example.theotherside;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -18,7 +17,7 @@ public class Tutorial extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.tutorial);
+        setContentView(R.layout.screen_how_to_play);
 
         dontShowTut = findViewById(R.id.dontShowTut);
         closeTutorialButton = findViewById(R.id.imageButton);
@@ -27,7 +26,7 @@ public class Tutorial extends AppCompatActivity {
         boolean dontShowAgain = sharedPreferences.getBoolean("dontShowAgain", false);
 
         if (dontShowAgain) {
-            finish();
+            navigateToScreenHighScore();
         }
 
         dontShowTut.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -38,16 +37,21 @@ public class Tutorial extends AppCompatActivity {
 
         // The listener for the close (X) button
         closeTutorialButton.setOnClickListener(v -> {
-            // Proceed to the next screen but currently just close the tutorial since we don't have a next yet
             if (dontShowTut.isChecked()) {
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putBoolean("dontShowAgain", true);
                 editor.apply();
             }
 
-            finish();
-
             Toast.makeText(Tutorial.this, "Tutorial skipped.", Toast.LENGTH_SHORT).show();
+            navigateToScreenHighScore();
         });
+    }
+
+    // navigate to ScreenHighScore
+    private void navigateToScreenHighScore() {
+        Intent intent = new Intent(Tutorial.this, ScreenHighScore.class);
+        startActivity(intent);
+        finish(); // Tutorial activity is closed
     }
 }
