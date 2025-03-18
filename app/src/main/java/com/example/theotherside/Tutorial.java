@@ -11,7 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class Tutorial extends AppCompatActivity {
 
-    // Declare UI elements
+    //UI elements
     private CheckBox dontShowTut;
     private ImageButton closeTutorialButton;
 
@@ -36,9 +36,9 @@ public class Tutorial extends AppCompatActivity {
             editor.apply();
         });
 
-        // Set up the listener for the close (X) button
+        // The listener for the close (X) button
         closeTutorialButton.setOnClickListener(v -> {
-            //proceed to the next screen but currently just close the tutorial since we don't have a next yet
+            // Proceed to the next screen but currently just close the tutorial since we don't have a next yet
             if (dontShowTut.isChecked()) {
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putBoolean("dontShowAgain", true);
