@@ -11,7 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class Tutorial extends AppCompatActivity {
 
-    //UI elements
+    // UI elements
     private CheckBox dontShowTut;
     private ImageButton closeTutorialButton;
 
