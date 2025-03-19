@@ -17,15 +17,16 @@
         app:srcCompat="@drawable/logo" />
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/playNowButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="@drawable/play_now_button"
+        android:fontFamily="@font/poppins"
+        android:paddingHorizontal="36sp"
         android:text="@string/play_now"
         android:textAllCaps="false"
         android:textColor="@color/white"
-        android:paddingHorizontal="36sp"
         app:backgroundTint="@null"
-        android:background="@drawable/play_now_button"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

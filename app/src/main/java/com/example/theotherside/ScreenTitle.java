@@ -1,6 +1,8 @@
 package com.example.theotherside;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Button;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,5 +17,12 @@ public class ScreenTitle extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.screen_title);
+        Button playNowButton = findViewById(R.id.playNowButton);
+
+        playNowButton.setOnClickListener(v -> {
+                // an Intent to start ScreenHighScore
+                Intent intent = new Intent(ScreenTitle.this, ScreenHighScore.class);
+                startActivity(intent);
+            });
     }
 }

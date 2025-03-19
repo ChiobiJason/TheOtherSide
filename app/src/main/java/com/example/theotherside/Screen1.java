@@ -14,8 +14,8 @@ public class Screen1 extends AppCompatActivity {
 
     private VideoView videoView;
     private ImageButton muteButton;
-    private Button skipIntroButton;
-    private boolean isMuted = false;
+    private ImageButton skipIntro;
+    //private boolean isMuted = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,7 +23,7 @@ public class Screen1 extends AppCompatActivity {
         setContentView(R.layout.screen_joke_setup);
 
         VideoView videoView = findViewById(R.id.videoView);
-        ImageButton muteButton = findViewById(R.id.muteButton);
+        //ImageButton muteButton = findViewById(R.id.muteButton);
 
 
         String videoPath = "android.resource://" + getPackageName() + "/" + R.raw.screen1_video;
