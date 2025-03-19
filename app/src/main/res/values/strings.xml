@@ -2,4 +2,6 @@
     <string name="app_name">The Other Side</string>
     <string name="the_other_side">THE OTHER SIDE</string>
     <string name="play_now">Play Now</string>
+    <string name="score">Score:</string>
+    <string name="coins">Coins:</string>
 </resources>
