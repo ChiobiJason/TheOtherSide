@@ -14,6 +14,6 @@ public class ScreenJokePunchline2 extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.screen_joke_punchline_2);
+//        setContentView(R.layout.screen_joke_punchline_2);
     }
 }
