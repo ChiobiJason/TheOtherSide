@@ -1,6 +1,9 @@
 package com.example.theotherside;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Button;
+import android.widget.ImageButton;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,5 +18,13 @@ public class ScreenHighScore extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.screen_high_score);
+
+        ImageButton startGameButton = findViewById(R.id.startGameButton);
+
+        startGameButton.setOnClickListener(v -> {
+            // an Intent to start ScreenHighScore
+            Intent intent = new Intent(ScreenHighScore.this, ScreenGamePlay.class);
+            startActivity(intent);
+        });
     }
 }
