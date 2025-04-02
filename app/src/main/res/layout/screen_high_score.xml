@@ -58,7 +58,7 @@
         app:layout_constraintVertical_bias="0.366" />
 
     <ImageButton
-        android:id="@+id/imageButton2"
+        android:id="@+id/shopButton"
         android:layout_width="192dp"
         android:layout_height="172dp"
         android:background="@drawable/rounded_button"
