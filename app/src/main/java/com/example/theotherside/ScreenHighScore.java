@@ -22,9 +22,7 @@ public class ScreenHighScore extends AppCompatActivity {
         ImageButton startGameButton = findViewById(R.id.startGameButton);
 
         startGameButton.setOnClickListener(v -> {
-            // an Intent to start ScreenHighScore
-            Intent intent = new Intent(ScreenHighScore.this, ScreenGamePlay.class);
-            startActivity(intent);
+            // an Intent to start GamePlay
         });
     }
 }
