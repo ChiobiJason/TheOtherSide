@@ -1,3 +1,19 @@
+/*
+ * This file contains the GameView class which serves as the main game engine
+ * and rendering surface for the game. It handles game logic, object management,
+ * collision detection, score tracking, and user input processing.
+ *
+ * The class manages:
+ * - Game loop and timing
+ * - Object spawning and updates
+ * - Collision detection
+ * - Score tracking
+ * - Touch input and swipe detection
+ * - Game state management
+ * - Rendering of all game elements
+ *
+ */
+
 package com.example.theotherside;
 
 import android.content.Context;
@@ -14,6 +30,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Random;
 
+/**
+ * Main game view class that handles the game loop, rendering, and game logic.
+ * Implements Runnable to run the game loop in a separate thread and extends
+ * SurfaceView for efficient rendering.
+ */
 public class GameView extends SurfaceView implements Runnable {
     private Thread gameThread;
     private SurfaceHolder holder;
@@ -39,7 +60,13 @@ public class GameView extends SurfaceView implements Runnable {
     private float touchStartY;
     private static final int MIN_SWIPE_DISTANCE = 100;
 
-
+    /**
+     * Creates a new game view with the specified dimensions.
+     *
+     * @param context - The application context
+     * @param screenWidth - The width of the game screen
+     * @param screenHeight - The height of the game screen
+     */
     public GameView(Context context, int screenWidth, int screenHeight) {
         super(context);
 
@@ -52,12 +79,17 @@ public class GameView extends SurfaceView implements Runnable {
 
         // Load background bitmap
         backgroundBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.road);
-        backgroundBitmap = Bitmap.createScaledBitmap(backgroundBitmap, screenWidth, screenHeight, false);
+        backgroundBitmap = Bitmap.createScaledBitmap(backgroundBitmap, screenWidth,
+                screenHeight, false);
 
         // Initialize game objects
         resetGame();
     }
 
+    /**
+     * Resets the game state to initial values.
+     * Creates new game objects and resets score and timers.
+     */
     private void resetGame() {
         chicken = new Chicken(getContext(), screenWidth, screenHeight, laneCount);
         cars = new ArrayList<>();
@@ -67,6 +99,9 @@ public class GameView extends SurfaceView implements Runnable {
         lastCarTime = lastCoinTime = System.currentTimeMillis();
     }
 
+    /**
+     * Main game loop that updates game state and renders the game.
+     */
     @Override
     public void run() {
         while (isPlaying) {
@@ -76,6 +111,10 @@ public class GameView extends SurfaceView implements Runnable {
         }
     }
 
+    /**
+     * Updates the game state including object positions,
+     * collision detection, and object spawning.
+     */
     private void update() {
         if (isGameOver) {
             return;
@@ -84,7 +123,8 @@ public class GameView extends SurfaceView implements Runnable {
         // Generate cars
         long currentTime = System.currentTimeMillis();
         if (currentTime - lastCarTime > carFrequency) {
-            cars.add(new Car(getContext(), screenWidth, screenHeight, laneCount, random.nextInt(8)));
+            cars.add(new Car(getContext(), screenWidth, screenHeight,
+                    laneCount, random.nextInt(8)));
             lastCarTime = currentTime;
 
             // Increase difficulty over time
@@ -133,6 +173,10 @@ public class GameView extends SurfaceView implements Runnable {
         }
     }
 
+    /**
+     * Renders all game elements to the screen.
+     * Includes background, game objects, score, and game over message.
+     */
     private void draw() {
         if (holder.getSurface().isValid()) {
             canvas = holder.lockCanvas();
@@ -164,18 +208,23 @@ public class GameView extends SurfaceView implements Runnable {
                 paint.setTextSize(100);
                 String gameOver = "GAME OVER";
                 float textWidth = paint.measureText(gameOver);
-                canvas.drawText(gameOver, (screenWidth - textWidth) / 2, screenHeight / 2, paint);
+                canvas.drawText(gameOver, (screenWidth - textWidth) / 2,
+                        screenHeight / 2, paint);
 
                 paint.setTextSize(60);
                 String tapToRestart = "Tap to restart";
                 textWidth = paint.measureText(tapToRestart);
-                canvas.drawText(tapToRestart, (screenWidth - textWidth) / 2, screenHeight / 2 + 100, paint);
+                canvas.drawText(tapToRestart, (screenWidth - textWidth) / 2,
+                        screenHeight / 2 + 100, paint);
             }
 
             holder.unlockCanvasAndPost(canvas);
         }
     }
 
+    /**
+     * Controls the game loop timing to maintain approximately 60 FPS.
+     */
     private void control() {
         try {
             Thread.sleep(17); // ~60 FPS
@@ -184,6 +233,9 @@ public class GameView extends SurfaceView implements Runnable {
         }
     }
 
+    /**
+     * Pauses the game loop and stops the game thread.
+     */
     public void pause() {
         isPlaying = false;
         try {
@@ -193,23 +245,40 @@ public class GameView extends SurfaceView implements Runnable {
         }
     }
 
+    /**
+     * Resumes the game loop and starts the game thread.
+     */
     public void resume() {
         isPlaying = true;
         gameThread = new Thread(this);
         gameThread.start();
     }
+
+    /**
+     * Handles right swipe gesture by moving the chicken right.
+     */
     public void onSwipeRight() {
         if (!isGameOver) {
             chicken.moveRight();
         }
     }
 
+    /**
+     * Handles left swipe gesture by moving the chicken left.
+     */
     public void onSwipeLeft() {
         if (!isGameOver) {
             chicken.moveLeft();
         }
     }
 
+    /**
+     * Processes touch events for game control.
+     * Handles swipe gestures and game restart on game over.
+     *
+     * @param event - The motion event to process
+     * @return true if the event was handled, false otherwise
+     */
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         switch (event.getAction()) {
