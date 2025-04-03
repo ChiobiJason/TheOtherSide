@@ -13,10 +13,17 @@ public class ScreenHighScore extends AppCompatActivity {
         setContentView(R.layout.screen_high_score);
 
         ImageButton shopButton = findViewById(R.id.shopButton);
+        ImageButton startButton = findViewById(R.id.startGameButton);
 
         if (shopButton != null) {  // Null check to prevent crashes
             shopButton.setOnClickListener(v -> {
                 Intent intent = new Intent(ScreenHighScore.this, Shop.class);
+                startActivity(intent);
+            });
+        }
+        if (startButton != null) {  // Null check to prevent crashes
+            startButton.setOnClickListener(v -> {
+                Intent intent = new Intent(ScreenHighScore.this, GameActivity.class);
                 startActivity(intent);
             });
         }
