@@ -37,6 +37,10 @@
         <activity
             android:name=".Shop"
             android:exported="false"/>
+        <activity
+            android:name=".GameActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.NoActionBar" />
     </application>
 
 </manifest>
