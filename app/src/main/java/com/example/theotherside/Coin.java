@@ -17,10 +17,10 @@ public class Coin extends GameObject {
         int lane = random.nextInt(laneCount);
 
         // Position horizontally in lane
-        this.x = lane * laneWidth + (laneWidth - width) / 2;
+        this.posX = lane * laneWidth + (laneWidth - width) / 2;
 
         // Start above screen
-        this.y = -height;
+        this.posY = -height;
 
         // Fixed speed
         this.speed = 5;
@@ -29,11 +29,11 @@ public class Coin extends GameObject {
     }
 
     public void update() {
-        y += speed;
+        posY += speed;
         super.update();
     }
 
     public boolean isOffScreen(float screenHeight) {
-        return y > screenHeight;
+        return posY > screenHeight;
     }
 }

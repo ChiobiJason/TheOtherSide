@@ -20,8 +20,8 @@ public class Chicken extends GameObject {
         this.currentLane = laneCount / 2;
 
         // Position chicken at bottom of screen
-        this.x = currentLane * laneWidth + (laneWidth - width) / 2;
-        this.y = screenHeight - height - 50; // Small gap from bottom
+        this.posX = currentLane * laneWidth + (laneWidth - width) / 2;
+        this.posY = screenHeight - height - 50; // Small gap from bottom
 
         update();
     }
@@ -29,7 +29,7 @@ public class Chicken extends GameObject {
     public void moveLeft() {
         if (currentLane > 0) {
             currentLane--;
-            x = currentLane * laneWidth + (laneWidth - width) / 2;
+            posX = currentLane * laneWidth + (laneWidth - width) / 2;
             update();
         }
     }
@@ -37,7 +37,7 @@ public class Chicken extends GameObject {
     public void moveRight() {
         if (currentLane < laneCount - 1) {
             currentLane++;
-            x = currentLane * laneWidth + (laneWidth - width) / 2;
+            posX = currentLane * laneWidth + (laneWidth - width) / 2;
             update();
         }
     }
