@@ -58,7 +58,7 @@
         app:layout_constraintVertical_bias="0.366" />
 
     <ImageButton
-        android:id="@+id/imageButton2"
+        android:id="@+id/shopButton"
         android:layout_width="192dp"
         android:layout_height="172dp"
         android:background="@drawable/rounded_button"
@@ -67,12 +67,12 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.502"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageButton3"
+        app:layout_constraintTop_toBottomOf="@+id/startGameButton"
         app:layout_constraintVertical_bias="0.0"
         app:srcCompat="@drawable/frame_2" />
 
     <ImageButton
-        android:id="@+id/imageButton3"
+        android:id="@+id/startGameButton"
         android:layout_width="192dp"
         android:layout_height="172dp"
         android:adjustViewBounds="false"
