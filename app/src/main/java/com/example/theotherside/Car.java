@@ -36,26 +36,28 @@ public class Car extends GameObject {
      * @param laneCount - The number of lanes available for car placement
      * @param carType - The type of car to create (determines sprite)
      */
-    public Car(Context context, float screenWidth, float screenHeight, int laneCount, int carType) {
-        super(0, 0, BitmapFactory.decodeResource(context.getResources(),
-                getCarResourceId(carType)));
-
+    public Car(Context context, float screenWidth, float screenHeight, int laneCount, int carType, int lane) {
+        super(0, 0, BitmapFactory.decodeResource(context.getResources(), getCarResourceId(carType)));
         float laneWidth = screenWidth / laneCount;
 
-        // Random lane
-        int lane = random.nextInt(laneCount);
-
-        // Position horizontally in lane
+        // Use the provided lane instead of a random one
         this.posX = lane * laneWidth + (laneWidth - width) / 2;
 
-        // Start above screen
-        this.posY = -height;
+        // Randomize the starting position slightly within the lane to avoid cars appearing in a line
+        this.posX += (random.nextFloat() * 10) - 5; // Shift by -5 to +5 pixels
 
-        // Random speed between 5 and 15
-        this.speed = FIXED_SPEED;
+        // Vary starting position vertically to avoid cars being exactly lined up
+        this.posY = -height - (random.nextFloat() * 100);
+
+        // Randomize speed slightly to avoid cars bunching up
+        this.speed = FIXED_SPEED + (random.nextFloat() * 3) - 1.5f; // FIXED_SPEED +/- 1.5
 
         update();
     }
+    public Car(Context context, float screenWidth, float screenHeight, int laneCount, int carType) {
+        this(context, screenWidth, screenHeight, laneCount, carType, random.nextInt(laneCount));
+    }
+
 
     /**
      * Determines which car sprite to use based on the car type.

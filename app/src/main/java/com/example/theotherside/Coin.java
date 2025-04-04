@@ -29,24 +29,26 @@ public class Coin extends GameObject {
      * @param screenHeight - The height of the game screen
      * @param laneCount - The number of lanes available for coin placement
      */
-    public Coin(Context context, float screenWidth, float screenHeight, int laneCount) {
+    public Coin(Context context, float screenWidth, float screenHeight, int laneCount, int lane) {
         super(0, 0, BitmapFactory.decodeResource(context.getResources(), R.drawable.coin));
-
         float laneWidth = screenWidth / laneCount;
 
-        // Random lane
-        int lane = random.nextInt(laneCount);
-
-        // Position horizontally in lane
+        // Use the provided lane instead of a random one
         this.posX = lane * laneWidth + (laneWidth - width) / 2;
 
-        // Start above screen
-        this.posY = -height;
+        // Slightly randomize position within lane
+        this.posX += (random.nextFloat() * 10) - 5; // Shift by -5 to +5 pixels
+
+        // Start above screen with some random variation
+        this.posY = -height - (random.nextFloat() * 50);
 
         // Fixed speed
         this.speed = 5;
 
         update();
+    }
+    public Coin(Context context, float screenWidth, float screenHeight, int laneCount) {
+        this(context, screenWidth, screenHeight, laneCount, random.nextInt(laneCount));
     }
 
     /**
