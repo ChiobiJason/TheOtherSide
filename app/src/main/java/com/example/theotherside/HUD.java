@@ -1,3 +1,17 @@
+/*
+ * This file contains the HUD class which manages the game's heads-up display interface.
+ * The class handles rendering game status information, controls, and visual effects
+ * with a modern dynamic island style design.
+ *
+ * The class manages:
+ * - Score display with coin icon
+ * - Pause/play button functionality
+ * - Countdown system (3, 2, 1, GO!)
+ * - Semi-transparent overlay effects
+ * - Touch detection for UI controls
+ *
+ */
+
 package com.example.theotherside;
 
 import android.content.Context;
@@ -10,9 +24,12 @@ import android.graphics.RectF;
 import android.graphics.Typeface;
 
 public class HUD {
+    // Paint objects for rendering
     private Paint paint, shadowPaint;
     private int screenWidth, screenHeight;
     private Bitmap playBitmap, pauseBitmap, coinBitmap;
+
+    // Game state variables
     private boolean isPaused;
     private RectF hudBox;
     private int score;
@@ -22,10 +39,19 @@ public class HUD {
     private int countdownValue; // 3, 2, 1, Go!
     private long lastCountdownTime;
 
+    /**
+     * Constructs a new HUD with specified screen dimensions.
+     * Initializes all UI elements including buttons, fonts, and the display box.
+     *
+     * @param context - The Android context for accessing resources
+     * @param screenWidth - Width of the screen in pixels
+     * @param screenHeight - Height of the screen in pixels
+     */
     public HUD(Context context, int screenWidth, int screenHeight) {
         this.screenWidth = screenWidth;
         this.screenHeight = screenHeight;
 
+        // Initialize paint objects
         paint = new Paint();
         shadowPaint = new Paint();
         shadowPaint.setColor(Color.BLACK);
@@ -51,33 +77,55 @@ public class HUD {
 
         hudBox = new RectF(boxX, boxY, boxX + boxWidth, boxY + boxHeight);
 
-        // Init state
+        // Initialize state variables
         isPaused = false;
         score = 0;
 
-        // Countdown init
+        // Countdown initialization
         isCountingDown = false;
         countdownValue = 3;
     }
 
+    /**
+     * Updates the current score displayed in the HUD.
+     *
+     * @param score - The new score value to display
+     */
     public void setScore(int score) {
         this.score = score;
     }
 
+    /**
+     * Returns the current pause state of the game.
+     *
+     * @return boolean indicating if the game is paused
+     */
     public boolean isPaused() {
         return isPaused;
     }
 
+    /**
+     * Returns the current countdown state.
+     *
+     * @return boolean indicating if countdown is active
+     */
     public boolean isCountingDown() {
         return isCountingDown;
     }
 
+    /**
+     * Initiates the countdown sequence from 3 to "GO!".
+     */
     public void startCountdown() {
         isCountingDown = true;
         countdownValue = 3;
         lastCountdownTime = System.currentTimeMillis();
     }
 
+    /**
+     * Updates the countdown timer, decrements the counter every second,
+     * and handles the transition from countdown to game start.
+     */
     public void updateCountdown() {
         if (!isCountingDown) return;
 
@@ -93,6 +141,9 @@ public class HUD {
         }
     }
 
+    /**
+     * Toggles the pause state and initiates countdown when unpausing.
+     */
     public void togglePause() {
         isPaused = !isPaused;
         if (!isPaused) {
@@ -101,6 +152,13 @@ public class HUD {
         }
     }
 
+    /**
+     * Checks if a touch event occurred within the pause/play button area.
+     *
+     * @param touchX - X coordinate of the touch event
+     * @param touchY - Y coordinate of the touch event
+     * @return boolean indicating if the button was pressed
+     */
     public boolean checkButtonPress(float touchX, float touchY) {
         // Check if touch is within the pause/play button area (right side of HUD)
         float buttonX = hudBox.right - 80;
@@ -109,6 +167,13 @@ public class HUD {
         return buttonArea.contains(touchX, touchY);
     }
 
+    /**
+     * Draws the complete HUD including background, score, buttons, and countdown
+     * if active. Implements visual effects like shadows and glows for enhanced
+     * appearance.
+     *
+     * @param canvas - The Canvas object to draw on
+     */
     public void draw(Canvas canvas) {
         // Draw beautiful semi-transparent background for HUD
         paint.setColor(Color.argb(200, 30, 30, 30)); // Dark semi-transparent
@@ -156,7 +221,8 @@ public class HUD {
             paint.setColor(Color.WHITE);
             paint.setTextSize(150);
             paint.setTextAlign(Paint.Align.CENTER);
-            paint.setShadowLayer(15, 0, 0, Color.argb(180, 255, 165, 0)); // Orange glow
+            paint.setShadowLayer(15, 0, 0, Color.argb(180,
+                    255, 165, 0)); // Orange glow
 
             String countdownText = countdownValue > 0 ? String.valueOf(countdownValue) : "GO!";
             canvas.drawText(countdownText, screenWidth / 2f, screenHeight / 2f, paint);
