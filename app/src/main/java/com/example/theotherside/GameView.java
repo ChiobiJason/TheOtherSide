@@ -54,13 +54,13 @@ public class GameView extends SurfaceView implements Runnable {
 
 
     private Chicken chicken;
-    private ArrayList<Car> cars;
+    private ArrayList<Cart> carts;
     private ArrayList<Coin> coins;
 
     private int screenWidth, screenHeight;
     private int score;
-    private long lastCarTime, lastCoinTime;
-    private int carFrequency = 1000; // milliseconds
+    private long lastCartTime, lastCoinTime;
+    private int cartFrequency = 1000; // milliseconds
     private int coinFrequency = 2000; // milliseconds
     private int coinsCollected;
     private int laneCount = 4;
@@ -103,12 +103,12 @@ public class GameView extends SurfaceView implements Runnable {
      */
     private void resetGame() {
         chicken = new Chicken(getContext(), screenWidth, screenHeight, laneCount);
-        cars = new ArrayList<>();
+        carts = new ArrayList<>();
         coins = new ArrayList<>();
         score = 0;
         hud.setScore(0); // Reset HUD score
         isGameOver = false;
-        lastCarTime = lastCoinTime = System.currentTimeMillis();
+        lastCartTime = lastCoinTime = System.currentTimeMillis();
 
         gameStartTime = System.currentTimeMillis();
         distanceTraveled = 0f;
@@ -154,25 +154,25 @@ public class GameView extends SurfaceView implements Runnable {
 
         long currentTime = System.currentTimeMillis();
 
-        // Generate cars with guaranteed escape path
-        if (currentTime - lastCarTime > carFrequency) {
+        // Generate carts with guaranteed escape path
+        if (currentTime - lastCartTime > cartFrequency) {
             // Create a map to track danger zones in each lane
             boolean[] laneDanger = new boolean[laneCount];
 
-            // Track how far down the screen cars have traveled in each lane
-            float[] laneCarProgress = new float[laneCount];
+            // Track how far down the screen carts have traveled in each lane
+            float[] laneCartProgress = new float[laneCount];
             for (int i = 0; i < laneCount; i++) {
-                laneCarProgress[i] = screenHeight; // Initialize to screen bottom
+                laneCartProgress[i] = screenHeight; // Initialize to screen bottom
             }
 
-            // Check existing cars to determine danger zones
-            // A lane is dangerous if a car is in the top 70% of the screen
-            for (Car car : cars) {
-                if (car.posY < screenHeight * 0.7) {
-                    int carLane = getLaneFromX(car.posX, car.width);
-                    if (carLane >= 0 && carLane < laneCount) {
-                        laneDanger[carLane] = true;
-                        laneCarProgress[carLane] = Math.min(laneCarProgress[carLane], car.posY);
+            // Check existing carts to determine danger zones
+            // A lane is dangerous if a cart is in the top 70% of the screen
+            for (Cart cart : carts) {
+                if (cart.posY < screenHeight * 0.7) {
+                    int cartLane = getLaneFromX(cart.posX, cart.width);
+                    if (cartLane >= 0 && cartLane < laneCount) {
+                        laneDanger[cartLane] = true;
+                        laneCartProgress[cartLane] = Math.min(laneCartProgress[cartLane], cart.posY);
                     }
                 }
             }
@@ -186,34 +186,35 @@ public class GameView extends SurfaceView implements Runnable {
                 // A lane is an escape lane if:
                 // 1. It's not dangerous, OR
                 // 2. The danger is far enough away to escape to another lane
-                if (!laneDanger[i] || laneCarProgress[i] > screenHeight * 0.4) {
+                if (!laneDanger[i] || laneCartProgress[i] > screenHeight * 0.4) {
                     escapeLanes.add(i);
                 }
             }
 
-            // If there's only one escape lane and it's not the chicken's lane, don't spawn a car there
+            // If there's only one escape lane and it's not the chicken's lane, don't spawn a cart there
             if (escapeLanes.size() == 1 && escapeLanes.get(0) != chickenLane) {
                 int onlyEscapeLane = escapeLanes.get(0);
 
                 // Choose from lanes other than the only escape lane
                 ArrayList<Integer> spawnLanes = new ArrayList<>();
                 for (int i = 0; i < laneCount; i++) {
-                    if (i != onlyEscapeLane && (laneCarProgress[i] > screenHeight * 0.3)) {
+                    if (i != onlyEscapeLane && (laneCartProgress[i] > screenHeight * 0.3)) {
                         spawnLanes.add(i);
                     }
                 }
 
-                // Only spawn a car if there's a valid lane
+                // Only spawn a cart if there's a valid lane
                 if (!spawnLanes.isEmpty()) {
                     int selectedLane = spawnLanes.get(random.nextInt(spawnLanes.size()));
-                    Car newCar = new Car(getContext(), screenWidth, screenHeight, laneCount, random.nextInt(8), selectedLane);
-                    cars.add(newCar);
-                    lastCarTime = currentTime;
+                    Cart newCart = new Cart(getContext(), screenWidth, screenHeight,
+                            laneCount, random.nextInt(10), selectedLane);
+                    carts.add(newCart);
+                    lastCartTime = currentTime;
                 }
             }
-            // If there are multiple escape lanes, we can spawn a car in one
+            // If there are multiple escape lanes, we can spawn a cart in one
             else if (escapeLanes.size() > 1) {
-                // Never spawn a car in the chicken's lane if it's one of several escape lanes
+                // Never spawn a cart in the chicken's lane if it's one of several escape lanes
                 if (escapeLanes.contains(chickenLane)) {
                     escapeLanes.remove(Integer.valueOf(chickenLane));
                 }
@@ -221,31 +222,32 @@ public class GameView extends SurfaceView implements Runnable {
                 // Select a random lane from the remaining escape lanes
                 if (!escapeLanes.isEmpty()) {
                     int selectedLane = escapeLanes.get(random.nextInt(escapeLanes.size()));
-                    Car newCar = new Car(getContext(), screenWidth, screenHeight, laneCount, random.nextInt(8), selectedLane);
-                    cars.add(newCar);
-                    lastCarTime = currentTime;
+                    Cart newCart = new Cart(getContext(), screenWidth, screenHeight,
+                            laneCount, random.nextInt(10), selectedLane);
+                    carts.add(newCart);
+                    lastCartTime = currentTime;
                 }
             }
-            // If there are no escape lanes, don't spawn a car at all
+            // If there are no escape lanes, don't spawn a cart at all
             else {
-                lastCarTime = currentTime; // Reset timer
+                lastCartTime = currentTime; // Reset timer
             }
 
             // Gradually increase difficulty by reducing spawn time
             // but keep a minimum threshold to ensure game remains playable
-            carFrequency = Math.max(1000 - (score * 3), 600);
+            cartFrequency = Math.max(1000 - (score * 3), 600);
         }
 
         // Generate coins with similar logic to ensure they don't block escape paths
         if (currentTime - lastCoinTime > coinFrequency) {
-            // Don't spawn coins in lanes that already have cars near the top
+            // Don't spawn coins in lanes that already have carts near the top
             boolean[] laneBusy = new boolean[laneCount];
 
-            for (Car car : cars) {
-                if (car.posY < screenHeight * 0.4) {
-                    int carLane = getLaneFromX(car.posX, car.width);
-                    if (carLane >= 0 && carLane < laneCount) {
-                        laneBusy[carLane] = true;
+            for (Cart cart : carts) {
+                if (cart.posY < screenHeight * 0.4) {
+                    int cartLane = getLaneFromX(cart.posX, cart.width);
+                    if (cartLane >= 0 && cartLane < laneCount) {
+                        laneBusy[cartLane] = true;
                     }
                 }
             }
@@ -274,21 +276,22 @@ public class GameView extends SurfaceView implements Runnable {
             // Spawn coin if there's at least one available lane
             if (!availableLanes.isEmpty()) {
                 int selectedLane = availableLanes.get(random.nextInt(availableLanes.size()));
-                coins.add(new Coin(getContext(), screenWidth, screenHeight, laneCount, selectedLane));
+                coins.add(new Coin(getContext(), screenWidth, screenHeight,
+                        laneCount, selectedLane));
                 lastCoinTime = currentTime;
             } else {
                 lastCoinTime = currentTime; // Reset timer
             }
         }
 
-        // Update cars
-        Iterator<Car> carIterator = cars.iterator();
-        while (carIterator.hasNext()) {
-            Car car = carIterator.next();
-            car.update();
+        // Update carts
+        Iterator<Cart> cartIterator = carts.iterator();
+        while (cartIterator.hasNext()) {
+            Cart cart = cartIterator.next();
+            cart.update();
 
             // Check for collision with chicken
-            if (car.isColliding(chicken)) {
+            if (cart.isColliding(chicken)) {
                 SoundManager.getInstance(getContext()).playCrashSound();
                 isGameOver = true;
 
@@ -296,9 +299,9 @@ public class GameView extends SurfaceView implements Runnable {
                 saveHighScore(currentScore);
             }
 
-            // Remove off-screen cars
-            if (car.isOffScreen(screenHeight)) {
-                carIterator.remove();
+            // Remove off-screen carts
+            if (cart.isOffScreen(screenHeight)) {
+                cartIterator.remove();
             }
         }
 
@@ -357,9 +360,9 @@ public class GameView extends SurfaceView implements Runnable {
                 coin.draw(canvas);
             }
 
-            // Draw cars
-            for (Car car : cars) {
-                car.draw(canvas);
+            // Draw carts
+            for (Cart cart : carts) {
+                cart.draw(canvas);
             }
 
             // Draw chicken
@@ -375,13 +378,15 @@ public class GameView extends SurfaceView implements Runnable {
                 paint.setTextSize(100);
                 String gameOver = "GAME OVER";
                 float textWidth = paint.measureText(gameOver);
-                canvas.drawText(gameOver, (screenWidth - textWidth) / 2, screenHeight / 2, paint);
+                canvas.drawText(gameOver, (screenWidth - textWidth) / 2,
+                        screenHeight / 2, paint);
 
                 paint.setColor(Color.WHITE);
                 paint.setTextSize(60);
                 String tapToRestart = "Tap to restart";
                 textWidth = paint.measureText(tapToRestart);
-                canvas.drawText(tapToRestart, (screenWidth - textWidth) / 2, screenHeight / 2 + 100, paint);
+                canvas.drawText(tapToRestart, (screenWidth - textWidth) / 2,
+                        screenHeight / 2 + 100, paint);
             }
 
             // Draw HUD on top of everything (after game over overlay if present)
