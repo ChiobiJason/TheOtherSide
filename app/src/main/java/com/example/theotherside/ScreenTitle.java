@@ -20,6 +20,7 @@ public class ScreenTitle extends AppCompatActivity {
         Button playNowButton = findViewById(R.id.playNowButton);
 
         playNowButton.setOnClickListener(v -> {
+            SoundManager.getInstance(ScreenTitle.this).playButtonClick();
                 // an Intent to start ScreenHighScore
                 Intent intent = new Intent(ScreenTitle.this, ScreenHighScore.class);
                 startActivity(intent);

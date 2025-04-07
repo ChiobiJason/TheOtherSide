@@ -1,8 +1,12 @@
 package com.example.theotherside;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.ImageButton;
+import android.widget.TextView;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 public class ScreenHighScore extends AppCompatActivity {
@@ -29,5 +33,11 @@ public class ScreenHighScore extends AppCompatActivity {
                 startActivity(intent);
             });
         }
+//load highscore
+        SharedPreferences prefs = getSharedPreferences("GamePrefs", Context.MODE_PRIVATE);
+        int highScore = prefs.getInt("highScore", 0);
+
+        TextView highScoreText = findViewById(R.id.highScore);
+        highScoreText.setText(""+highScore);
     }
 }

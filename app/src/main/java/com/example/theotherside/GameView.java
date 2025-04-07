@@ -17,6 +17,7 @@
 package com.example.theotherside;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -38,6 +39,7 @@ import java.util.Random;
 public class GameView extends SurfaceView implements Runnable {
     private long gameStartTime;
     private float distanceTraveled;
+    private int currentScore;
     private static final float BASE_SPEED = 0.2f;
 
     private Thread gameThread;
@@ -289,6 +291,9 @@ public class GameView extends SurfaceView implements Runnable {
             if (car.isColliding(chicken)) {
                 SoundManager.getInstance(getContext()).playCrashSound();
                 isGameOver = true;
+
+                currentScore = Math.round(distanceTraveled/100);
+                saveHighScore(currentScore);
             }
 
             // Remove off-screen cars
@@ -317,6 +322,17 @@ public class GameView extends SurfaceView implements Runnable {
         }
         // Update HUD score
         hud.setScore(distanceTraveled);;
+    }
+
+    private void saveHighScore(int newScore) {
+        SharedPreferences prefs = getContext().getSharedPreferences("GamePrefs", Context.MODE_PRIVATE);
+        int storedHighScore = prefs.getInt("highScore", 0);
+
+        if (newScore > storedHighScore) {
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putInt("highScore", newScore);
+            editor.apply(); // Don't forget this!
+        }
     }
 
     private int getLaneFromX(float posX, float width) {
