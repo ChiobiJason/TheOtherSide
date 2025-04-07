@@ -7,7 +7,7 @@
     android:background="#F8F2EE">
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/highScoreLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="@font/poppins"
@@ -19,7 +19,7 @@
         app:layout_constraintVertical_bias="0.169" />
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/highScore"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="@font/peralta"

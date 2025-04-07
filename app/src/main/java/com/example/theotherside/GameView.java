@@ -36,6 +36,10 @@ import java.util.Random;
  * SurfaceView for efficient rendering.
  */
 public class GameView extends SurfaceView implements Runnable {
+    private long gameStartTime;
+    private float distanceTraveled;
+    private static final float BASE_SPEED = 0.2f;
+
     private Thread gameThread;
     private SurfaceHolder holder;
     private boolean isPlaying;
@@ -56,6 +60,7 @@ public class GameView extends SurfaceView implements Runnable {
     private long lastCarTime, lastCoinTime;
     private int carFrequency = 1000; // milliseconds
     private int coinFrequency = 2000; // milliseconds
+    private int coinsCollected;
     private int laneCount = 4;
     private Random random;
     private float touchStartX;
@@ -103,6 +108,9 @@ public class GameView extends SurfaceView implements Runnable {
         isGameOver = false;
         lastCarTime = lastCoinTime = System.currentTimeMillis();
 
+        gameStartTime = System.currentTimeMillis();
+        distanceTraveled = 0f;
+
         // Start countdown when game is reset
         hud.startCountdown();
     }
@@ -132,6 +140,12 @@ public class GameView extends SurfaceView implements Runnable {
      * collision detection, and object spawning.
      */
     private void update() {
+        if (!isGameOver && !hud.isPaused() && !hud.isCountingDown()) {
+            long currentTime = System.currentTimeMillis();
+            distanceTraveled = ((currentTime - gameStartTime) * BASE_SPEED)/100;
+            hud.setDistance(distanceTraveled); // update HUD
+        }
+
         if (isGameOver) {
             return;
         }
@@ -289,10 +303,11 @@ public class GameView extends SurfaceView implements Runnable {
             Coin coin = coinIterator.next();
             coin.update();
             // Check for collision with chicken
+            // when collecting coins:
             if (coin.isColliding(chicken)) {
                 SoundManager.getInstance(getContext()).playCoinSound();
-                score++;
-                hud.setScore(score); // Update the HUD score
+                coinsCollected++;
+                hud.setCoins(coinsCollected); // Update HUD
                 coinIterator.remove();
             }
             // Remove off-screen coins
@@ -301,7 +316,7 @@ public class GameView extends SurfaceView implements Runnable {
             }
         }
         // Update HUD score
-        hud.setScore(score);
+        hud.setScore(distanceTraveled);;
     }
 
     private int getLaneFromX(float posX, float width) {

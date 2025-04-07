@@ -20,6 +20,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 
@@ -38,6 +39,10 @@ public class HUD {
     private boolean isCountingDown;
     private int countdownValue; // 3, 2, 1, Go!
     private long lastCountdownTime;
+    private int coinsCollected;
+
+
+    private float currentDistance;
 
     /**
      * Constructs a new HUD with specified screen dimensions.
@@ -53,6 +58,7 @@ public class HUD {
 
         // Initialize paint objects
         paint = new Paint();
+        paint.setTextSize(50);
         shadowPaint = new Paint();
         shadowPaint.setColor(Color.BLACK);
         shadowPaint.setTextSize(50);
@@ -69,8 +75,8 @@ public class HUD {
         pauseBitmap = Bitmap.createScaledBitmap(pauseBitmap, buttonSize, buttonSize, true);
         coinBitmap = Bitmap.createScaledBitmap(coinBitmap, buttonSize, buttonSize, true);
 
-        // Create unified HUD box (dynamic island style)
-        int boxWidth = screenWidth / 2;
+        // Create HUD box
+        int boxWidth = (screenWidth / 2) + 150;
         int boxHeight = 110;
         int boxX = (screenWidth - boxWidth) / 2;
         int boxY = 80;
@@ -89,11 +95,13 @@ public class HUD {
     /**
      * Updates the current score displayed in the HUD.
      *
-     * @param score - The new score value to display
+     * @param distance - The new score value to display
      */
-    public void setScore(int score) {
-        this.score = score;
+    public void setScore(float distance) {
+        this.score = Math.round(distance);
     }
+
+
 
     /**
      * Returns the current pause state of the game.
@@ -174,60 +182,114 @@ public class HUD {
      *
      * @param canvas - The Canvas object to draw on
      */
+    /**
+     * Draws the complete HUD including background, score, buttons, and countdown
+     * if active. Implements visual effects like shadows and glows for enhanced
+     * appearance.
+     *
+     * @param canvas - The Canvas object to draw on
+     */
     public void draw(Canvas canvas) {
-        // Draw beautiful semi-transparent background for HUD
-        paint.setColor(Color.argb(200, 30, 30, 30)); // Dark semi-transparent
+        // Draw HUD background
+        paint.setColor(Color.argb(200, 30, 30, 30));
         canvas.drawRoundRect(hudBox, 40, 40, paint);
 
-        // Add subtle border glow
+        // Border glow
         paint.setColor(Color.argb(60, 255, 255, 255));
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(2);
         canvas.drawRoundRect(hudBox, 40, 40, paint);
         paint.setStyle(Paint.Style.FILL);
 
-        // Draw coin icon on left side
-        float coinX = hudBox.left + 20;
-        float coinY = hudBox.centerY() - coinBitmap.getHeight() / 2;
-        canvas.drawBitmap(coinBitmap, coinX, coinY, paint);
+        // ===== VERTICAL ALIGNMENT CALCULATIONS =====
+        float centerY = hudBox.centerY();
 
-        // Draw score text with subtle shadow for depth
-        paint.setColor(Color.WHITE);
-        paint.setTextSize(40);
-        paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
-        String scoreText = String.valueOf(score);
-        float textX = coinX + coinBitmap.getWidth() + 15;
-        float textY = hudBox.centerY() + 15;
+        // ===== COIN SECTION =====
+        float coinPadding = 30; // Space between left edge and coin
+        float coinSpacing = 20; // Space between coin and text
 
-        // Draw shadow text first
-        canvas.drawText(scoreText, textX + 2, textY + 2, shadowPaint);
+        // Coin icon (centered vertically)
+        float coinTop = centerY - (coinBitmap.getHeight() / 2f);
+        canvas.drawBitmap(coinBitmap, hudBox.left + coinPadding, coinTop, paint);
 
-        // Draw actual text
-        canvas.drawText(scoreText, textX, textY, paint);
+        // Coin count text
+        String coinText = String.valueOf(coinsCollected);
+        float coinTextX = hudBox.left + coinPadding + coinBitmap.getWidth() + coinSpacing;
 
-        // Draw play/pause button on right side
-        Bitmap buttonBitmap = isPaused ? playBitmap : pauseBitmap;
-        float buttonX = hudBox.right - buttonBitmap.getWidth() - 20;
-        float buttonY = hudBox.centerY() - buttonBitmap.getHeight() / 2;
+        // Measure text bounds directly
+        Rect textBounds = new Rect();
+        paint.getTextBounds(coinText, 0, coinText.length(), textBounds);
+        float textHeight = textBounds.height();
+        float textVerticalOffset = textHeight / 2f;
+        float textY = centerY + textVerticalOffset;
+
+        // Draw the text, now vertically centered
+        canvas.drawText(coinText, coinTextX + 2, textY + 2, shadowPaint); // Shadow
+        canvas.drawText(coinText, coinTextX, textY, paint); // Main text
+
+        // ===== SCORE SECTION =====
+        float scorePadding = 120; // space between right edge and score text
+        String scoreText = "SCORE: " + score;
+        float scoreTextWidth = paint.measureText(scoreText);
+
+        // Measure text boundaries
+        Rect textBoundsScore = new Rect();
+        paint.getTextBounds(scoreText, 0, scoreText.length(), textBoundsScore);
+        float textHeightScore = textBoundsScore.height();
+        float textVerticalOffsetScore = textHeightScore / 2f;
+        float textYScore = centerY + textVerticalOffsetScore;
+
+        // Position score text
+        float scoreX = hudBox.right - scorePadding - scoreTextWidth;
+        canvas.drawText(scoreText, scoreX + 2, textYScore + 2, shadowPaint); // Shadow
+        canvas.drawText(scoreText, scoreX, textYScore, paint); // Main text
+
+        // ===== PAUSE/BUTTON =====
+        float buttonSize = pauseBitmap.getWidth();
+        float buttonPadding = 20;
+        float buttonX = hudBox.right - buttonSize - buttonPadding;
+        float buttonY = centerY - (buttonSize / 2f);
+        Bitmap buttonBitmap;
+        if (isPaused) {
+            buttonBitmap = playBitmap;
+        } else {
+            buttonBitmap = pauseBitmap;
+        }
+
         canvas.drawBitmap(buttonBitmap, buttonX, buttonY, paint);
 
-        // Draw countdown if active
-        if (isCountingDown) {
-            // Transparent overlay
+        // ===== COUNTDOWN =====
+        if (isCountingDown) {            // overlay
             paint.setColor(Color.argb(120, 0, 0, 0));
             canvas.drawRect(0, 0, screenWidth, screenHeight, paint);
 
-            // Draw countdown with style
+            // Countdown text
             paint.setColor(Color.WHITE);
             paint.setTextSize(150);
             paint.setTextAlign(Paint.Align.CENTER);
-            paint.setShadowLayer(15, 0, 0, Color.argb(180,
-                    255, 165, 0)); // Orange glow
+            paint.setShadowLayer(15, 0, 0, Color.argb(180, 255, 165, 0));
 
-            String countdownText = countdownValue > 0 ? String.valueOf(countdownValue) : "GO!";
-            canvas.drawText(countdownText, screenWidth / 2f, screenHeight / 2f, paint);
-            paint.setShadowLayer(0, 0, 0, 0); // Reset shadow
+            String countText;
+            if (countdownValue > 0){
+                countText = String.valueOf(countdownValue);
+            } else
+                countText = "GO!";
+            canvas.drawText(countText, screenWidth/2f, screenHeight/2f, paint);
+
+            // Reset paint
+            paint.setShadowLayer(0, 0, 0, 0);
             paint.setTextAlign(Paint.Align.LEFT);
+            paint.setTextSize(50);
         }
+
+        float dividerX = hudBox.left + (hudBox.width() * 0.35f); // start 35% from left
+        canvas.drawLine(dividerX, hudBox.top, dividerX, hudBox.bottom, paint);
     }
+    public void setDistance(float distance) {
+        this.currentDistance = distance;
+    }
+    public void setCoins(int coins) {
+        this.coinsCollected = coins;
+    }
+
 }
