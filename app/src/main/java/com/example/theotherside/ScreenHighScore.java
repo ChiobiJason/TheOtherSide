@@ -17,12 +17,14 @@ public class ScreenHighScore extends AppCompatActivity {
 
         if (shopButton != null) {  // Null check to prevent crashes
             shopButton.setOnClickListener(v -> {
+                SoundManager.getInstance(ScreenHighScore.this).playButtonClick();
                 Intent intent = new Intent(ScreenHighScore.this, Shop.class);
                 startActivity(intent);
             });
         }
         if (startButton != null) {  // Null check to prevent crashes
             startButton.setOnClickListener(v -> {
+                SoundManager.getInstance(ScreenHighScore.this).playButtonClick();
                 Intent intent = new Intent(ScreenHighScore.this, GameActivity.class);
                 startActivity(intent);
             });

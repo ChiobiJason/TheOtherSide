@@ -25,10 +25,10 @@
         android:layout_marginStart="16dp"
         android:layout_marginBottom="16dp"
         android:background="@android:color/transparent"
-        android:tint="#d54e49"
+        app:tint="#d54e49"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@android:drawable/ic_lock_silent_mode" />
+        app:srcCompat="@drawable/ic_volume_off" />
 
     <ImageButton
         android:id="@+id/skipIntro"
@@ -37,7 +37,7 @@
         android:layout_marginEnd="16dp"
         android:background="@android:color/transparent"
         android:src="@android:drawable/ic_media_ff"
-        android:tint="#d54e49"
+        app:tint="#d54e49"
         app:layout_constraintBottom_toBottomOf="@+id/muteButton"
         app:layout_constraintEnd_toEndOf="parent" />
 

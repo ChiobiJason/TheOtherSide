@@ -22,8 +22,19 @@ public class Screen1 extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.screen_joke_setup);
 
+        //initialise SoundManager
+        SoundManager.getInstance(this);
+
+        // mute button
+        muteButton = findViewById(R.id.muteButton);
+        updateMuteButton(); // this sets inital icon
+
+        muteButton.setOnClickListener(view -> {
+            SoundManager.getInstance(this).makeMute();
+            updateMuteButton();
+        });
+
         VideoView videoView = findViewById(R.id.videoView);
-        //ImageButton muteButton = findViewById(R.id.muteButton);
 
 
         String videoPath = "android.resource://" + getPackageName() + "/" + R.raw.screen1_video;
@@ -47,19 +58,22 @@ public class Screen1 extends AppCompatActivity {
             }
         });
 
+        muteButton.setOnClickListener(view -> {
+            SoundManager.getInstance(this).makeMute();
+                    if (SoundManager.getInstance(this).isMuted()) {
+                        muteButton.setImageResource(R.drawable.ic_volume_off);
+                    } else {
+                        muteButton.setImageResource(R.drawable.ic_volume_up);
+            }
+        });
 
-//        muteButton.setOnClickListener(v -> {
-//            if (isMuted) {
-//                // unmute
-//                videoView.setVolume(1.0f, 1.0f); // Set volume to max
-//                muteButton.setImageResource(R.drawable.ic_volume_up);
-//            } else {
-//                // Mute
-//                videoView.setVolume(0.0f, 0.0f); // Set volume to 0
-//                muteButton.setImageResource(R.drawable.ic_volume_off);
-//            }
-//            isMuted = !isMuted;
-//        });
+    }
 
+    private void updateMuteButton(){
+        if (SoundManager.getInstance(this).isMuted()) {
+            muteButton.setImageResource(R.drawable.ic_volume_off);
+        } else {
+            muteButton.setImageResource(R.drawable.ic_volume_up);
+        }
     }
 }

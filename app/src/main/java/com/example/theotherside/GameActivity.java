@@ -24,6 +24,8 @@ import androidx.appcompat.app.AppCompatActivity;
  * adding game-specific initialization and lifecycle management.
  */
 public class GameActivity extends AppCompatActivity {
+
+    private SoundManager soundManager;
     private GameView gameView;
 
     /**
@@ -43,6 +45,10 @@ public class GameActivity extends AppCompatActivity {
         // Create game view with screen dimensions
         gameView = new GameView(this, size.x, size.y);
         setContentView(gameView);
+
+        // Initialise sound manager
+        soundManager = SoundManager.getInstance(this);
+        soundManager.startBgMusic();
     }
 
     /**
@@ -53,6 +59,7 @@ public class GameActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         gameView.pause();
+        soundManager.pauseBgMusic();
     }
 
     /**
@@ -63,5 +70,13 @@ public class GameActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         gameView.resume();
+        soundManager.startBgMusic();
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        soundManager.release();
+    }
+
 }

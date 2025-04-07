@@ -273,6 +273,7 @@ public class GameView extends SurfaceView implements Runnable {
 
             // Check for collision with chicken
             if (car.isColliding(chicken)) {
+                SoundManager.getInstance(getContext()).playCrashSound();
                 isGameOver = true;
             }
 
@@ -289,6 +290,7 @@ public class GameView extends SurfaceView implements Runnable {
             coin.update();
             // Check for collision with chicken
             if (coin.isColliding(chicken)) {
+                SoundManager.getInstance(getContext()).playCoinSound();
                 score++;
                 hud.setScore(score); // Update the HUD score
                 coinIterator.remove();
@@ -394,6 +396,7 @@ public class GameView extends SurfaceView implements Runnable {
      * Handles right swipe gesture by moving the chicken right.
      */
     public void onSwipeRight() {
+        SoundManager.getInstance(getContext()).playJumpSound();
         if (!isGameOver) {
             chicken.moveRight();
         }
@@ -403,6 +406,7 @@ public class GameView extends SurfaceView implements Runnable {
      * Handles left swipe gesture by moving the chicken left.
      */
     public void onSwipeLeft() {
+        SoundManager.getInstance(getContext()).playJumpSound();
         if (!isGameOver) {
             chicken.moveLeft();
         }
