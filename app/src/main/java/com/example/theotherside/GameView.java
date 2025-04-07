@@ -297,6 +297,7 @@ public class GameView extends SurfaceView implements Runnable {
 
                 currentScore = Math.round(distanceTraveled/100);
                 saveHighScore(currentScore);
+                saveCoins(coinsCollected);
             }
 
             // Remove off-screen carts
@@ -327,6 +328,11 @@ public class GameView extends SurfaceView implements Runnable {
         hud.setScore(distanceTraveled);;
     }
 
+    /**
+     * Saves the high score if the new score is greater than the stored high score.
+     *
+     * @param newScore - The new score to compare with the stored high score
+     */
     private void saveHighScore(int newScore) {
         SharedPreferences prefs = getContext().getSharedPreferences("GamePrefs", Context.MODE_PRIVATE);
         int storedHighScore = prefs.getInt("highScore", 0);
@@ -334,15 +340,37 @@ public class GameView extends SurfaceView implements Runnable {
         if (newScore > storedHighScore) {
             SharedPreferences.Editor editor = prefs.edit();
             editor.putInt("highScore", newScore);
-            editor.apply(); // Don't forget this!
+            editor.apply();
         }
     }
 
+    /**
+     * Determines the lane index based on the x position and width of an object.
+     *
+     * @param posX - The x position of the object
+     * @param width - The width of the object
+     * @return The lane index where the object is located
+     */
     private int getLaneFromX(float posX, float width) {
         float laneWidth = screenWidth / laneCount;
         float objectCenterX = posX + width / 2;
         return (int)(objectCenterX / laneWidth);
     }
+
+    /**
+     * Saves the total number of coins collected by adding to the stored coin count.
+     *
+     * @param numOfCoinsCollected - The number of coins collected in the current session
+     */
+    private void saveCoins(int numOfCoinsCollected) {
+        SharedPreferences prefs2 = getContext().getSharedPreferences("GamePrefs", Context.MODE_PRIVATE);
+        int storedCoinCount = prefs2.getInt("coinCount", 0);
+
+        SharedPreferences.Editor editor = prefs2.edit();
+        editor.putInt("coinCount", numOfCoinsCollected + storedCoinCount);
+        editor.apply();
+    }
+
 
     /**
      * Renders all game elements to the screen.
@@ -408,10 +436,13 @@ public class GameView extends SurfaceView implements Runnable {
     }
 
     /**
-     * Pauses the game loop and stops the game thread.
+     * Pauses the game loop, saves game state and stops the game thread.
      */
     public void pause() {
         isPlaying = false;
+        saveCoins(coinsCollected);
+        saveHighScore(currentScore);
+
         try {
             gameThread.join();
         } catch (InterruptedException e) {

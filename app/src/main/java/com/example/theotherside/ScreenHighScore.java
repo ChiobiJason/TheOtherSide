@@ -33,11 +33,19 @@ public class ScreenHighScore extends AppCompatActivity {
                 startActivity(intent);
             });
         }
-//load highscore
+
+        // Update highscore
         SharedPreferences prefs = getSharedPreferences("GamePrefs", Context.MODE_PRIVATE);
         int highScore = prefs.getInt("highScore", 0);
 
         TextView highScoreText = findViewById(R.id.highScore);
         highScoreText.setText(""+highScore);
+
+        // Update collected coins
+        SharedPreferences prefs2 = getSharedPreferences("GamePrefs", Context.MODE_PRIVATE);
+        int coinCount = prefs2.getInt("coinCount", 0);
+
+        TextView coinCountText = findViewById(R.id.coinCount);
+        coinCountText.setText(""+coinCount);
     }
 }
