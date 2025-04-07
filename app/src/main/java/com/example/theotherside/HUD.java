@@ -98,7 +98,7 @@ public class HUD {
      * @param distance - The new score value to display
      */
     public void setScore(float distance) {
-        this.score = Math.round(distance);
+        this.score = Math.round(distance/100);
     }
 
 

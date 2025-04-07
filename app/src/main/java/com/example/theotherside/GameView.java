@@ -142,7 +142,7 @@ public class GameView extends SurfaceView implements Runnable {
     private void update() {
         if (!isGameOver && !hud.isPaused() && !hud.isCountingDown()) {
             long currentTime = System.currentTimeMillis();
-            distanceTraveled = ((currentTime - gameStartTime) * BASE_SPEED)/100;
+            distanceTraveled = ((currentTime - gameStartTime) * BASE_SPEED);
             hud.setDistance(distanceTraveled); // update HUD
         }
 
