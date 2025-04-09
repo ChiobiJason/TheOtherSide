@@ -16,7 +16,9 @@
 
 package com.example.theotherside;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -400,21 +402,28 @@ public class GameView extends SurfaceView implements Runnable {
             if (isGameOver) {
                 // Semi-transparent overlay
                 paint.setColor(Color.argb(120, 0, 0, 0));
-                canvas.drawRect(0, 0, screenWidth, screenHeight, paint);
+                canvas.drawRect(0, screenHeight/2 - 150, screenWidth, screenHeight/2 + 250, paint);
 
+                // Game Over text
                 paint.setColor(Color.RED);
                 paint.setTextSize(100);
                 String gameOver = "GAME OVER";
                 float textWidth = paint.measureText(gameOver);
-                canvas.drawText(gameOver, (screenWidth - textWidth) / 2,
-                        screenHeight / 2, paint);
+                canvas.drawText(gameOver, (screenWidth - textWidth) / 2, screenHeight / 2, paint);
 
+                // Restart text
                 paint.setColor(Color.WHITE);
                 paint.setTextSize(60);
                 String tapToRestart = "Tap to restart";
                 textWidth = paint.measureText(tapToRestart);
-                canvas.drawText(tapToRestart, (screenWidth - textWidth) / 2,
-                        screenHeight / 2 + 100, paint);
+                float restartY = screenHeight / 2 + 100;
+                canvas.drawText(tapToRestart, (screenWidth - textWidth) / 2, restartY, paint);
+
+                // Back to Home text
+                String backToHome = "Back to Home";
+                textWidth = paint.measureText(backToHome);
+                float homeY = restartY + 100;
+                canvas.drawText(backToHome, (screenWidth - textWidth) / 2, homeY, paint);
             }
 
             // Draw HUD on top of everything (after game over overlay if present)
@@ -502,9 +511,21 @@ public class GameView extends SurfaceView implements Runnable {
                 }
 
                 if (isGameOver) {
-                    // Restart game on tap if game over
-                    resetGame();
-                    return true;
+                    float tapY = event.getY();
+                    float centerY = screenHeight / 2;
+
+                    // Check if tap is in restart area (100px around restart text)
+                    if (tapY > centerY + 50 && tapY < centerY + 150) {
+                        resetGame();
+                        return true;
+                    }
+                    // Check if tap is in home area (100px around home text)
+                    else if (tapY > centerY + 150 && tapY < centerY + 250) {
+                        // Return to main activity
+                        getContext().startActivity(new Intent(getContext(), ScreenHighScore.class));
+                        ((Activity) getContext()).finish();
+                        return true;
+                    }
                 }
                 return true;
 
