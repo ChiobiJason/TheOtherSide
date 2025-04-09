@@ -69,15 +69,24 @@ public class SoundManager {
         bgMusicPlayer.setVolume(isMuted ? 0 : volume, isMuted ? 0 : volume);
     }
 
+    // TO FIX: music stops playing after playing again
     public void startBgMusic() {
-        if (!bgMusicPlayer.isPlaying()) {
-            bgMusicPlayer.start();
+        try {
+            if (bgMusicPlayer != null && !bgMusicPlayer.isPlaying()) {
+                bgMusicPlayer.start();
+            }
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
         }
     }
 
     public void pauseBgMusic() {
-        if (bgMusicPlayer.isPlaying()) {
-            bgMusicPlayer.pause();
+        try {
+            if (bgMusicPlayer != null && bgMusicPlayer.isPlaying()) {
+                bgMusicPlayer.pause();
+            }
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
         }
     }
 
