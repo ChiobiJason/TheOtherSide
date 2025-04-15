@@ -80,7 +80,7 @@ public class ExampleInstrumentedTest {
     }
 
     @Test
-    public void testUpdate() {
+    public void testGameObjectUpdate() {
         Bitmap sampleBitmap = Bitmap.createBitmap(20, 20, Bitmap.Config.ARGB_8888);
         GameObject sampleObject = new GameObject(10f, 10f, sampleBitmap);
 
@@ -99,7 +99,7 @@ public class ExampleInstrumentedTest {
     }
 
     @Test
-    public void testDraw() {
+    public void testGameObjectDraw() {
         // Use a real Canvas with a Bitmap for drawing
         Bitmap canvasBitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(canvasBitmap);
@@ -149,5 +149,88 @@ public class ExampleInstrumentedTest {
 
         // Objects should not collide
         assertFalse(object1.isColliding(object2));
+    }
+
+
+
+    //==============================================================================================
+    //         Coin Class Tests
+    //==============================================================================================
+    @Test
+    public void testCoinCreation() {
+        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        Coin sampleCoin = new Coin(context, 500f, 20f, 5, 2);
+
+        assertNotNull(sampleCoin);
+    }
+
+    @Test
+    public void testCoinDefaultConstructor() {
+        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        Coin sampleCoin = new Coin(context, 500f, 800f, 5);
+
+        assertNotNull(sampleCoin);
+        assertEquals(5f, sampleCoin.speed, 0.01);
+    }
+
+    @Test
+    public void testCoinSpeed() {
+        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        Coin sampleCoin = new Coin(context, 500f, 20f, 5, 2);
+
+        assertEquals(5f, sampleCoin.speed, 0.01);
+    }
+
+    @Test
+    public void testCoinPosition() {
+        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        // Make a coin in lane 3
+        Coin coin = new Coin(context, 500f, 800f, 5, 3);
+
+        // Check that it's somewhere in lane 3
+        // Lane width should be 100 (500/5)
+        // So lane 3 starts at position 300
+        assertTrue(coin.posX >= 295); // Allow for random -5
+        assertTrue(coin.posX <= 405); // Allow for random +5
+    }
+
+    @Test
+    public void testCoinStartsAbove() {
+        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        Coin coin = new Coin(context, 500f, 800f, 5, 2);
+
+        // Should start above screen
+        assertTrue(coin.posY < 0);
+    }
+
+    @Test
+    public void testCoinUpdate() {
+        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        Coin coin = new Coin(context, 500f, 800f, 5, 2);
+
+        float oldY = coin.posY;
+        coin.update();
+        float newY = coin.posY;
+
+        // Should move down by speed
+        assertEquals(oldY + 5, newY, 0.01f);
+    }
+
+    @Test
+    public void testCoinIsOffScreen() {
+        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        Coin coin = new Coin(context, 500f, 800f, 5, 2);
+
+        // Make it go off screen
+        coin.posY = 850f;
+
+        // Should be off screen
+        assertTrue(coin.isOffScreen(800f));
+
+        // Put it back on screen
+        coin.posY = 700f;
+
+        // Should be on screen
+        assertFalse(coin.isOffScreen(800f));
     }
 }
