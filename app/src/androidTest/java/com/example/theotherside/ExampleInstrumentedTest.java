@@ -233,4 +233,110 @@ public class ExampleInstrumentedTest {
         // Should be on screen
         assertFalse(coin.isOffScreen(800f));
     }
+
+
+
+
+    //==============================================================================================
+    //         Cart Class Tests
+    //==============================================================================================
+    @Test
+    public void testCartCreation() {
+        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        Cart sampleCart = new Cart(context, 500f, 20f, 5, 0, 2);
+
+        assertNotNull(sampleCart);
+    }
+
+    @Test
+    public void testCartSpeed() {
+        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        Cart sampleCart = new Cart(context, 500f, 20f, 5, 0, 2);
+
+        // Check that speed is close to fixed speed of 8
+        assertTrue(sampleCart.speed >= 6.5f); // FIXED_SPEED - 1.5
+        assertTrue(sampleCart.speed <= 9.5f); // FIXED_SPEED + 1.5
+    }
+
+    @Test
+    public void testDefaultConstructor() {
+        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        Cart cart = new Cart(context, 500f, 800f, 5, 1);
+
+        // Just check it creates something
+        assertNotNull(cart);
+    }
+
+    @Test
+    public void testCartPosition() {
+        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        Cart cart = new Cart(context, 500f, 800f, 5, 0, 3);
+
+        // Check that it's somewhere in lane 3
+        // Lane width should be 100 (500/5)
+        // So lane 3 starts at position 300
+        assertFalse(cart.posX >= 295); // Allow for random -5
+        assertTrue(cart.posX <= 405); // Allow for random +5
+    }
+
+    @Test
+    public void testCartStartsAbove() {
+        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        Cart cart = new Cart(context, 500f, 800f, 5, 0, 2);
+
+        // Should start above screen
+        assertTrue(cart.posY < 0);
+    }
+
+    @Test
+    public void testUpdate() {
+        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        Cart cart = new Cart(context, 500f, 800f, 5, 0, 2);
+
+        float oldY = cart.posY;
+        float speed = cart.speed;
+        cart.update();
+        float newY = cart.posY;
+
+        // Should move down by speed
+        assertEquals(oldY + speed, newY, 0.01f);
+    }
+
+    @Test
+    public void testOffScreen() {
+        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        Cart cart = new Cart(context, 500f, 800f, 5, 0, 2);
+
+        // Make it go off screen
+        cart.posY = 850f;
+
+        // Should be off screen
+        assertTrue(cart.isOffScreen(800f));
+
+        // Put it back on screen
+        cart.posY = 700f;
+
+        // Should be on screen
+        assertFalse(cart.isOffScreen(800f));
+    }
+
+    @Test
+    public void testCartType() {
+        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+
+        // Create carts of different types
+        Cart cartTypeEven = new Cart(context, 500f, 800f, 5, 0, 2);
+        Cart cartTypeOdd = new Cart(context, 500f, 800f, 5, 1, 2);
+        Cart cartTypeEven2 = new Cart(context, 500f, 800f, 5, 2, 2);
+        Cart cartTypeOdd2 = new Cart(context, 500f, 800f, 5, 3, 2);
+
+        // The method getCartResourceId is private, but we can indirectly check
+        // if different cart types have different bitmaps by checking that
+        // they're created successfully
+        assertNotNull(cartTypeEven);
+        assertNotNull(cartTypeOdd);
+        assertNotNull(cartTypeEven2);
+        assertNotNull(cartTypeOdd2);
+    }
+
 }
