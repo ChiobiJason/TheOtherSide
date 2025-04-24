@@ -76,9 +76,10 @@ public class GameView extends SurfaceView implements Runnable {
     private static final int MIN_SWIPE_DISTANCE = 100;
     private Bitmap reloadIcon, homeIcon;
     private RectF reloadButtonArea, homeButtonArea;
-    private float backgroundY1; // first road segment position
-    private float backgroundY2; // second road segment position
-    private float roadScrollSpeed = 5f;
+    private float baseSpeed = 5f;
+    private float speedMultiplier = 1.0f;
+    private static final float SPEED_INCREASE_PER_MINUTE = 0.5f;
+    private static final float MAX_SPEED = 30f;
 
 
     /**
@@ -173,7 +174,19 @@ public class GameView extends SurfaceView implements Runnable {
      */
     private void update() {
         if (!isGameOver && !hud.isPaused() && !hud.isCountingDown()) {
+
             long currentTime = System.currentTimeMillis();
+
+            // calculate speed increase
+            long elapsedMinutes = (currentTime - gameStartTime) / 3000;
+            speedMultiplier = 1.0f + (SPEED_INCREASE_PER_MINUTE * elapsedMinutes);
+
+            //  maximum speed
+            if (baseSpeed * speedMultiplier > MAX_SPEED) {
+                speedMultiplier = MAX_SPEED / baseSpeed;
+            }
+
+
             distanceTraveled = ((currentTime - gameStartTime) * BASE_SPEED);
             hud.setDistance(distanceTraveled); // update HUD
         }
@@ -318,6 +331,7 @@ public class GameView extends SurfaceView implements Runnable {
         Iterator<Cart> cartIterator = carts.iterator();
         while (cartIterator.hasNext()) {
             Cart cart = cartIterator.next();
+            cart.posY += baseSpeed * speedMultiplier;
             cart.update();
 
             // Check for collision with chicken

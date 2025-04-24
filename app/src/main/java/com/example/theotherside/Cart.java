@@ -25,7 +25,6 @@ import java.util.Random;
  */
 public class Cart extends GameObject {
     private static Random random = new Random();
-    private static final float FIXED_SPEED = 8;
 
     /**
      * Creates a new cart instance with specified parameters.
@@ -48,9 +47,6 @@ public class Cart extends GameObject {
 
         // Vary starting position vertically to avoid carts being exactly lined up
         this.posY = -height - (random.nextFloat() * 100);
-
-        // Randomize speed slightly to avoid carts bunching up
-        this.speed = FIXED_SPEED + (random.nextFloat() * 3) - 1.5f; // FIXED_SPEED +/- 1.5
 
         update();
     }
@@ -80,7 +76,6 @@ public class Cart extends GameObject {
      * Calls the parent class's update method to maintain the hitbox position.
      */
     public void update() {
-        posY += speed;
         super.update();
     }
 
