@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -31,6 +32,8 @@ public class ScreenHighScore extends AppCompatActivity {
                 SoundManager.getInstance(ScreenHighScore.this).playButtonClick();
                 Intent intent = new Intent(ScreenHighScore.this, GameActivity.class);
                 startActivity(intent);
+                Log.d("NAV_DEBUG", "Launching GameActivity");
+                startActivity(intent);
             });
         }
 
@@ -47,5 +50,8 @@ public class ScreenHighScore extends AppCompatActivity {
 
         TextView coinCountText = findViewById(R.id.coinCount);
         coinCountText.setText(""+coinCount);
+
+
     }
+
 }

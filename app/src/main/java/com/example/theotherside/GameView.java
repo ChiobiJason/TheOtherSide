@@ -25,9 +25,13 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.RectF;
+import android.graphics.drawable.Drawable;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+
+import androidx.core.content.ContextCompat;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -70,6 +74,12 @@ public class GameView extends SurfaceView implements Runnable {
     private float touchStartX;
     private float touchStartY;
     private static final int MIN_SWIPE_DISTANCE = 100;
+    private Bitmap reloadIcon, homeIcon;
+    private RectF reloadButtonArea, homeButtonArea;
+    private float backgroundY1; // first road segment position
+    private float backgroundY2; // second road segment position
+    private float roadScrollSpeed = 5f;
+
 
     /**
      * Creates a new game view with the specified dimensions.
@@ -90,6 +100,9 @@ public class GameView extends SurfaceView implements Runnable {
 
         // Load background bitmap
         backgroundBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.road);
+        if(backgroundBitmap == null) {
+            throw new RuntimeException("did not load road bitmap");
+        }
         backgroundBitmap = Bitmap.createScaledBitmap(backgroundBitmap, screenWidth,
                 screenHeight, false);
         // Initialize HUD
@@ -97,6 +110,21 @@ public class GameView extends SurfaceView implements Runnable {
 
         // Initialize game objects
         resetGame();
+
+        reloadIcon = getBitmapFromVector(R.drawable.ic_reload, screenWidth);
+        homeIcon = getBitmapFromVector(R.drawable.ic_home, screenWidth);
+    }
+
+    private Bitmap getBitmapFromVector(int vectorResId, int screenWidth) {
+        Drawable vectorDrawable = ContextCompat.getDrawable(getContext(), vectorResId);
+        int iconSize = (int) (screenWidth * 0.15);
+
+        Bitmap bitmap = Bitmap.createBitmap(iconSize, iconSize, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        vectorDrawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        vectorDrawable.draw(canvas);
+
+        return bitmap;
     }
 
     /**
@@ -398,11 +426,11 @@ public class GameView extends SurfaceView implements Runnable {
             // Draw chicken
             chicken.draw(canvas);
 
-            // Draw game over message if applicable
+            // Draw game over message when applicable
             if (isGameOver) {
                 // Semi-transparent overlay
-                paint.setColor(Color.argb(120, 0, 0, 0));
-                canvas.drawRect(0, screenHeight/2 - 150, screenWidth, screenHeight/2 + 250, paint);
+                paint.setColor(Color.argb(200, 0, 0, 0));
+                canvas.drawRect(0, screenHeight/2 - 150, screenWidth, screenHeight/2 + 400, paint);
 
                 // Game Over text
                 paint.setColor(Color.RED);
@@ -411,19 +439,21 @@ public class GameView extends SurfaceView implements Runnable {
                 float textWidth = paint.measureText(gameOver);
                 canvas.drawText(gameOver, (screenWidth - textWidth) / 2, screenHeight / 2, paint);
 
-                // Restart text
-                paint.setColor(Color.WHITE);
-                paint.setTextSize(60);
-                String tapToRestart = "Tap to restart";
-                textWidth = paint.measureText(tapToRestart);
-                float restartY = screenHeight / 2 + 100;
-                canvas.drawText(tapToRestart, (screenWidth - textWidth) / 2, restartY, paint);
+                float iconY = screenHeight / 2 + 150;
+                float padding = screenWidth * 0.1f;
+                float reloadX = (screenWidth / 2) - padding - reloadIcon.getWidth();
+                canvas.drawBitmap(reloadIcon, reloadX, iconY, paint);
+                float homeX = (screenWidth / 2) + padding;
+                canvas.drawBitmap(homeIcon, homeX, iconY, paint);
 
-                // Back to Home text
-                String backToHome = "Back to Home";
-                textWidth = paint.measureText(backToHome);
-                float homeY = restartY + 100;
-                canvas.drawText(backToHome, (screenWidth - textWidth) / 2, homeY, paint);
+                // save button areas for touch detection
+                reloadButtonArea = new RectF(reloadX, iconY,
+                        reloadX + reloadIcon.getWidth(), iconY + reloadIcon.getHeight());
+
+                homeButtonArea = new RectF(homeX, iconY,
+                        homeX + homeIcon.getWidth(), iconY + homeIcon.getHeight());
+
+
             }
 
             // Draw HUD on top of everything (after game over overlay if present)
@@ -511,17 +541,12 @@ public class GameView extends SurfaceView implements Runnable {
                 }
 
                 if (isGameOver) {
-                    float tapY = event.getY();
-                    float centerY = screenHeight / 2;
-
-                    // Check if tap is in restart area (100px around restart text)
-                    if (tapY > centerY + 50 && tapY < centerY + 150) {
+                    if (reloadButtonArea.contains(touchStartX, touchStartY)) {
                         resetGame();
                         return true;
                     }
-                    // Check if tap is in home area (100px around home text)
-                    else if (tapY > centerY + 150 && tapY < centerY + 250) {
-                        // Return to main activity
+                    else if (homeButtonArea.contains(touchStartX, touchStartY)) {
+                        // return to high score screen(home)
                         getContext().startActivity(new Intent(getContext(), ScreenHighScore.class));
                         ((Activity) getContext()).finish();
                         return true;

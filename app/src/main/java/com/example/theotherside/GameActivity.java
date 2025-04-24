@@ -15,6 +15,7 @@ package com.example.theotherside;
 
 import android.graphics.Point;
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -49,6 +50,8 @@ public class GameActivity extends AppCompatActivity {
         // Initialise sound manager
         soundManager = SoundManager.getInstance(this);
         soundManager.startBgMusic();
+
+        Log.d("NAV_DEBUG", "GameActivity created");
     }
 
     /**
