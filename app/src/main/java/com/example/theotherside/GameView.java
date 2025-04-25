@@ -57,6 +57,8 @@ public class GameView extends SurfaceView implements Runnable {
     private Canvas canvas;
     private Bitmap backgroundBitmap;
     private HUD hud;
+    private long lastChickenLaneCartTime = 0;
+    private static final long FORCE_SPAWN_TIMEOUT = 5000;
 
 
     private Chicken chicken;
@@ -174,18 +176,19 @@ public class GameView extends SurfaceView implements Runnable {
      */
     private void update() {
         if (!isGameOver && !hud.isPaused() && !hud.isCountingDown()) {
-
             long currentTime = System.currentTimeMillis();
 
-            // calculate speed increase
-            long elapsedMinutes = (currentTime - gameStartTime) / 3000;
-            speedMultiplier = 1.0f + (SPEED_INCREASE_PER_MINUTE * elapsedMinutes);
+            // Make speed increase more gradual - change 3000 to 10000 or higher
+            // for slower progression
+            float elapsedTime = (currentTime - gameStartTime) / 10000.0f;
 
-            //  maximum speed
+            // Reduce this constant for smoother progression
+            speedMultiplier = 1.0f + (SPEED_INCREASE_PER_MINUTE * 0.2f * elapsedTime);
+
+            // maximum speed
             if (baseSpeed * speedMultiplier > MAX_SPEED) {
                 speedMultiplier = MAX_SPEED / baseSpeed;
             }
-
 
             distanceTraveled = ((currentTime - gameStartTime) * BASE_SPEED);
             hud.setDistance(distanceTraveled); // update HUD
@@ -222,6 +225,20 @@ public class GameView extends SurfaceView implements Runnable {
 
             // Get the lane the chicken is currently in
             int chickenLane = getLaneFromX(chicken.posX, chicken.width);
+
+            // Force spawn after timeout
+            boolean forceSpawnInChickenLane = false;
+            if (currentTime - lastChickenLaneCartTime > FORCE_SPAWN_TIMEOUT) {
+                forceSpawnInChickenLane = true;
+            }
+            if (forceSpawnInChickenLane) {
+                // Force spawn in the chicken's lane after timeout
+                Cart newCart = new Cart(getContext(), screenWidth, screenHeight,
+                        laneCount, random.nextInt(10), chickenLane);
+                carts.add(newCart);
+                lastCartTime = currentTime;
+                lastChickenLaneCartTime = currentTime; // Reset timeout
+            }
 
             // Identify possible escape lanes
             ArrayList<Integer> escapeLanes = new ArrayList<>();
@@ -262,6 +279,7 @@ public class GameView extends SurfaceView implements Runnable {
                     escapeLanes.remove(Integer.valueOf(chickenLane));
                 }
 
+
                 // Select a random lane from the remaining escape lanes
                 if (!escapeLanes.isEmpty()) {
                     int selectedLane = escapeLanes.get(random.nextInt(escapeLanes.size()));
@@ -269,7 +287,11 @@ public class GameView extends SurfaceView implements Runnable {
                             laneCount, random.nextInt(10), selectedLane);
                     carts.add(newCart);
                     lastCartTime = currentTime;
+                    if (selectedLane == chickenLane) {
+                        lastChickenLaneCartTime = currentTime;
+                    }
                 }
+
             }
             // If there are no escape lanes, don't spawn a cart at all
             else {
