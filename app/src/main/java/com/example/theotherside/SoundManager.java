@@ -19,7 +19,7 @@ import android.os.Build;
 public class SoundManager {
     private static SoundManager instance;
     private final SoundPool soundPool;
-    private final MediaPlayer bgMusicPlayer;
+    private MediaPlayer bgMusicPlayer;
     private boolean isMuted = false;
     private float volume = 1.0f;
 
@@ -28,6 +28,8 @@ public class SoundManager {
     private int jumpSoundId;
     private int crashSoundId;
     private int buttonClickSoundId;
+    private int powerUpSoundId;
+    private Context context;
 
     /**
      * Private constructor to initialize SoundPool and MediaPlayer.
@@ -41,7 +43,7 @@ public class SoundManager {
                     .setMaxStreams(5)
                     .build();
         } else {
-            soundPool = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
+            soundPool = new SoundPool(6, AudioManager.STREAM_MUSIC, 0);
         }
 
         // Loading sounds
@@ -49,6 +51,7 @@ public class SoundManager {
         jumpSoundId = soundPool.load(context, R.raw.jump_sound, 1);
         crashSoundId = soundPool.load(context, R.raw.crash_sound, 1);
         buttonClickSoundId = soundPool.load(context, R.raw.button_click, 1);
+        powerUpSoundId = soundPool.load(context, R.raw.power_up, 1);
 
         // initialise background music
         bgMusicPlayer = MediaPlayer.create(context, R.raw.bg_music);
@@ -113,7 +116,11 @@ public class SoundManager {
     // TO FIX: music stops playing after playing again
     public void startBgMusic() {
         try {
-            if (bgMusicPlayer != null && !bgMusicPlayer.isPlaying()) {
+            if (bgMusicPlayer == null) {
+                bgMusicPlayer = MediaPlayer.create(context, R.raw.bg_music);
+                bgMusicPlayer.setLooping(true);
+            }
+            if (!bgMusicPlayer.isPlaying()) {
                 bgMusicPlayer.start();
             }
         } catch (IllegalStateException e) {
@@ -139,8 +146,11 @@ public class SoundManager {
      * Releases resources used by SoundPool and MediaPlayer.
      */
     public void release() {
+        if (bgMusicPlayer != null) {
+            bgMusicPlayer.release();
+            bgMusicPlayer = null;
+        }
         soundPool.release();
-        bgMusicPlayer.release();
     }
 
     /**
@@ -150,6 +160,10 @@ public class SoundManager {
      */
     public boolean isMuted() {
         return isMuted;
+    }
+
+    public void powerUpSound() {
+        if (!isMuted) soundPool.play(powerUpSoundId, volume, volume, 1, 0, 1);
     }
 }
 

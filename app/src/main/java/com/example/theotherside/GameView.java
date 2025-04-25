@@ -82,6 +82,7 @@ public class GameView extends SurfaceView implements Runnable {
     private float speedMultiplier = 1.0f;
     private static final float SPEED_INCREASE_PER_MINUTE = 0.5f;
     private static final float MAX_SPEED = 30f;
+    private int lastSpeedFloor = 1;
 
 
     /**
@@ -148,6 +149,7 @@ public class GameView extends SurfaceView implements Runnable {
 
         // Start countdown when game is reset
         hud.startCountdown();
+        lastSpeedFloor = 1;
     }
 
     /**
@@ -180,7 +182,7 @@ public class GameView extends SurfaceView implements Runnable {
 
             // Make speed increase more gradual - change 3000 to 10000 or higher
             // for slower progression
-            float elapsedTime = (currentTime - gameStartTime) / 10000.0f;
+            float elapsedTime = (currentTime - gameStartTime) / 8000.0f;
 
             // Reduce this constant for smoother progression
             speedMultiplier = 1.0f + (SPEED_INCREASE_PER_MINUTE * 0.2f * elapsedTime);
@@ -188,6 +190,13 @@ public class GameView extends SurfaceView implements Runnable {
             // maximum speed
             if (baseSpeed * speedMultiplier > MAX_SPEED) {
                 speedMultiplier = MAX_SPEED / baseSpeed;
+            }
+
+            // play sound when speed increases by 1.0
+            int currentFloor = (int) speedMultiplier;
+            if (currentFloor > lastSpeedFloor) {
+                SoundManager.getInstance(getContext()).powerUpSound();
+                lastSpeedFloor = currentFloor;
             }
 
             distanceTraveled = ((currentTime - gameStartTime) * BASE_SPEED);
@@ -482,7 +491,36 @@ public class GameView extends SurfaceView implements Runnable {
                 float homeX = (screenWidth / 2) + padding;
                 canvas.drawBitmap(homeIcon, homeX, iconY, paint);
 
-                // save button areas for touch detection
+                // button areas for touch detection
+                reloadButtonArea = new RectF(reloadX, iconY,
+                        reloadX + reloadIcon.getWidth(), iconY + reloadIcon.getHeight());
+
+                homeButtonArea = new RectF(homeX, iconY,
+                        homeX + homeIcon.getWidth(), iconY + homeIcon.getHeight());
+
+
+            }
+
+            if (hud.isPaused()) {
+                // Semi-transparent overlay
+                paint.setColor(Color.argb(200, 0, 0, 0));
+                canvas.drawRect(0, screenHeight/2 - 150, screenWidth, screenHeight/2 + 400, paint);
+
+                // Pause text
+                paint.setColor(Color.RED);
+                paint.setTextSize(100);
+                String gamePaused = "GAME PAUSED";
+                float textWidth = paint.measureText(gamePaused);
+                canvas.drawText(gamePaused, (screenWidth - textWidth) / 2, screenHeight / 2, paint);
+
+                float iconY = screenHeight / 2 + 150;
+                float padding = screenWidth * 0.1f;
+                float reloadX = (screenWidth / 2) - padding - reloadIcon.getWidth();
+                canvas.drawBitmap(reloadIcon, reloadX, iconY, paint);
+                float homeX = (screenWidth / 2) + padding;
+                canvas.drawBitmap(homeIcon, homeX, iconY, paint);
+
+                // button areas for touch detection
                 reloadButtonArea = new RectF(reloadX, iconY,
                         reloadX + reloadIcon.getWidth(), iconY + reloadIcon.getHeight());
 
@@ -538,9 +576,9 @@ public class GameView extends SurfaceView implements Runnable {
      * Handles right swipe gesture by moving the chicken right.
      */
     public void onSwipeRight() {
-        SoundManager.getInstance(getContext()).playJumpSound();
         if (!isGameOver) {
             chicken.moveRight();
+            SoundManager.getInstance(getContext()).playJumpSound();
         }
     }
 
@@ -576,12 +614,12 @@ public class GameView extends SurfaceView implements Runnable {
                     return true;
                 }
 
-                if (isGameOver) {
-                    if (reloadButtonArea.contains(touchStartX, touchStartY)) {
+                if (isGameOver || hud.isPaused()) {
+                    if (reloadButtonArea != null && reloadButtonArea.contains(touchStartX, touchStartY)) {
                         resetGame();
                         return true;
                     }
-                    else if (homeButtonArea.contains(touchStartX, touchStartY)) {
+                    else if (homeButtonArea != null && homeButtonArea.contains(touchStartX, touchStartY)) {
                         // return to high score screen(home)
                         getContext().startActivity(new Intent(getContext(), ScreenHighScore.class));
                         ((Activity) getContext()).finish();
@@ -605,9 +643,11 @@ public class GameView extends SurfaceView implements Runnable {
                         if (diffX > 0) {
                             // Swipe right
                             chicken.moveRight();
+                            SoundManager.getInstance(getContext()).playJumpSound();
                         } else {
                             // Swipe left
                             chicken.moveLeft();
+                            SoundManager.getInstance(getContext()).playJumpSound();
                         }
                     }
                 }

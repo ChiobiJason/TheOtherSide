@@ -80,6 +80,7 @@ public class GameActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         soundManager.release();
+        gameView.pause(); //prevent thread leaks
     }
 
 }
