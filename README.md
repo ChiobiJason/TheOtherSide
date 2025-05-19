@@ -104,7 +104,7 @@ res/
 - Introduce power-ups (e.g., temporary invincibility)
 - Add chicken customization
 - Implement difficulty scaling
-- Integrate Firebase for cloud save and leaderboard\
+- Integrate Firebase for cloud save and leaderboard
 - Implement Shop
 
 ---
