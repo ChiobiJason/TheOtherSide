@@ -7,7 +7,7 @@ android {
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.theotherside"
+        applicationId = "com.jasonthe_dev.theotherside"
         minSdk = 24
         targetSdk = 35
         versionCode = 1
